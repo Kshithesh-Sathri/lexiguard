@@ -7,7 +7,7 @@ import {
   simplifyClause,
   analyzePDF,
   compareDocuments
-} from '../controllers/analyzecontroller.js';
+} from '../controllers/analyzeController.js';
 
 const router = express.Router();
 
