@@ -1,0 +1,22 @@
+# Environment files - NEVER commit these
+backend/.env
+frontend/.env
+.env
+.env.local
+
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build output
+dist/
+build/
+*/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

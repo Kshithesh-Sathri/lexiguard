@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "LexiGuard",
+  "version": "1.0.0",
+  "description": "AI-powered dark pattern and legal risk detector",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["dashboard/index.html", "icons/*"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}

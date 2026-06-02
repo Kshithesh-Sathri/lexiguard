@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexiGuard — AI Legal Protection for Everyone</title>
+  <meta name="description" content="LexiGuard automatically scans Terms & Conditions and Privacy Policies to detect dark patterns, hidden subscriptions, and privacy risks.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050810;
+      --bg2: #0a0f1e;
+      --bg3: #0f1629;
+      --card: #111827;
+      --border: #1f2d45;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --purple: #6366f1;
+      --purple2: #8b5cf6;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Glow effects ── */
+    .glow-purple {
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+      top: -200px; left: -200px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-blue {
+      position: fixed;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+      bottom: -150px; right: -150px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(5,8,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(99,102,241,0.1);
+      padding: 0 48px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--purple), var(--purple2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      padding: 9px 22px;
+      background: linear-gradient(135deg, var(--purple), var(--purple2));
+      color: white !important;
+      border-radius: 10px;
+      font-weight: 600 !important;
+      font-size: 14px;
+      box-shadow: 0 0 20px rgba(99,102,241,0.3);
+      transition: all 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      box-shadow: 0 0 30px rgba(99,102,241,0.5) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 160px 48px 100px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 20px;
+      padding: 7px 18px;
+      font-size: 13px;
+      color: #a5b4fc;
+      margin-bottom: 32px;
+      animation: fadeDown 0.6s ease;
+    }
+
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #818cf8;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2.5px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    .hero h1 .white {
+      color: #f8fafc;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: #94a3b8;
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 72px;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    .btn-primary {
+      padding: 15px 36px;
+      background: linear-gradient(135deg, var(--purple), var(--purple2));
+      color: white;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 30px rgba(99,102,241,0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(99,102,241,0.5);
+    }
+
+    .btn-secondary {
+      padding: 15px 36px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(99,102,241,0.4);
+      background: rgba(99,102,241,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* ── Browser mockup ── */
+    .browser-mockup {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 700px;
+      margin: 0 auto 80px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6),
+                  0 0 0 1px rgba(99,102,241,0.1);
+      animation: fadeUp 0.8s ease 0.4s both;
+    }
+
+    .browser-bar {
+      background: #0d1424;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .browser-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .browser-url {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .browser-ext {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .ext-badge {
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      animation: badgePulse 2s infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+      50% { box-shadow: 0 0 0 4px rgba(239,68,68,0); }
+    }
+
+    .browser-content {
+      padding: 24px;
+      background: #080d1a;
+    }
+
+    /* Warning banner inside mockup */
+    .warning-banner {
+      position: relative;
+      background: #0f172a;
+      border: 1px solid var(--red);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(239,68,68,0.2);
+    }
+
+    .warning-icon { font-size: 28px; flex-shrink: 0; }
+
+    .warning-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fca5a5;
+      margin-bottom: 4px;
+    }
+
+    .warning-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .warning-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .warning-btn-primary {
+      padding: 5px 14px;
+      background: var(--red);
+      color: white;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .warning-btn-secondary {
+      padding: 5px 14px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .warning-score {
+      margin-left: auto;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .warning-score-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .warning-score-lbl {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* Fake page content */
+    .fake-page-line {
+      height: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .fake-highlight {
+      height: 10px;
+      background: rgba(239,68,68,0.2);
+      border-left: 2px solid var(--red);
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    /* ── Stats ── */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 40px 60px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Sections ── */
+    .section {
+      padding: 100px 48px;
+      max-width: 1140px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.2);
+      color: #a5b4fc;
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .section h2 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+
+    .section > p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 56px;
+      line-height: 1.7;
+    }
+
+    /* ── Feature cards ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(99,102,241,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── How it works ── */
+    .how-section {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .how-step {
+      padding: 40px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    .how-step:last-child { border-right: none; }
+
+    .how-step-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6366f1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .how-step-icon {
+      font-size: 36px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .how-step-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .how-step-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Dark patterns ── */
+    .patterns-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .pattern-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.25s;
+    }
+
+    .pattern-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(99,102,241,0.3);
+    }
+
+    .pattern-emoji { font-size: 28px; margin-bottom: 10px; }
+
+    .pattern-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .pattern-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── Example scan ── */
+    .scan-demo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 740px;
+      margin: 0 auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .scan-demo-header {
+      background: #0d1424;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .scan-demo-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .scan-demo-score {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-circle {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 3px solid var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--red);
+    }
+
+    .scan-demo-body { padding: 20px 24px; }
+
+    .risk-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .risk-row.high {
+      background: rgba(239,68,68,0.07);
+      border-left: 3px solid var(--red);
+    }
+
+    .risk-row.medium {
+      background: rgba(245,158,11,0.07);
+      border-left: 3px solid var(--yellow);
+    }
+
+    .risk-row.low {
+      background: rgba(59,130,246,0.07);
+      border-left: 3px solid #3b82f6;
+    }
+
+    .risk-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .risk-pill.high { background: rgba(239,68,68,0.15); color: var(--red); }
+    .risk-pill.medium { background: rgba(245,158,11,0.15); color: var(--yellow); }
+    .risk-pill.low { background: rgba(59,130,246,0.15); color: #3b82f6; }
+
+    .risk-content strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 3px;
+    }
+
+    .risk-content span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 120px 48px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .cta-section p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .cta-note-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--bg2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy { font-size: 13px; color: #334155; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-in:nth-child(2) { transition-delay: 0.1s; }
+    .fade-in:nth-child(3) { transition-delay: 0.2s; }
+    .fade-in:nth-child(4) { transition-delay: 0.3s; }
+    .fade-in:nth-child(5) { transition-delay: 0.4s; }
+    .fade-in:nth-child(6) { transition-delay: 0.5s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .how-grid { grid-template-columns: 1fr 1fr; }
+      .patterns-grid { grid-template-columns: 1fr 1fr; }
+      .stats { flex-wrap: wrap; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      nav { padding: 0 20px; }
+      .nav-links li:not(:last-child) { display: none; }
+      .section { padding: 60px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 32px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .patterns-grid { grid-template-columns: 1fr 1fr; }
+      .how-step { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background glows -->
+  <div class="glow-purple"></div>
+  <div class="glow-blue"></div>
+
+  <!-- Nav -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">🛡️</div>
+      LexiGuard
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#patterns">What we detect</a></li>
+      <li><a href="#" class="nav-cta">Add to Chrome — Free</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Powered by LLaMA AI · Free Forever
+    </div>
+
+    <h1>
+      <span class="white">Stop Getting Tricked</span><br>
+      <span class="gradient">by Legal Dark Patterns</span>
+    </h1>
+
+    <p>
+      LexiGuard automatically scans Terms & Conditions and Privacy Policies
+      to detect hidden risks before you click agree — no effort required.
+    </p>
+
+    <div class="hero-btns">
+      <a href="#" class="btn-primary">
+        🛡️ Add to Chrome — It's Free
+      </a>
+      <a href="#how" class="btn-secondary">
+        ▶ See how it works
+      </a>
+    </div>
+
+    <!-- Badge showcase -->
+<div style="display:flex;align-items:center;justify-content:center;
+  gap:40px;margin-bottom:40px;flex-wrap:wrap">
+  <div style="text-align:center">
+    <div style="width:72px;height:72px;background:#ef4444;border-radius:18px;
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      font-weight:900;color:white;margin:0 auto 8px;
+      box-shadow:0 0 30px rgba(239,68,68,0.5)">23</div>
+    <div style="font-size:12px;color:#ef4444;font-weight:600">High Risk</div>
+  </div>
+  <div style="text-align:center">
+    <div style="width:72px;height:72px;background:#f59e0b;border-radius:18px;
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      font-weight:900;color:white;margin:0 auto 8px;
+      box-shadow:0 0 30px rgba(245,158,11,0.5)">64</div>
+    <div style="font-size:12px;color:#f59e0b;font-weight:600">Moderate</div>
+  </div>
+  <div style="text-align:center">
+    <div style="width:72px;height:72px;background:#22c55e;border-radius:18px;
+      display:flex;align-items:center;justify-content:center;font-size:28px;
+      font-weight:900;color:white;margin:0 auto 8px;
+      box-shadow:0 0 30px rgba(34,197,94,0.5)">✓</div>
+    <div style="font-size:12px;color:#22c55e;font-weight:600">Safe</div>
+  </div>
+  <div style="font-size:13px;color:#475569;max-width:180px;
+    text-align:left;line-height:1.6;border-left:2px solid #1e2d45;
+    padding-left:16px">
+    Icon automatically changes color on every legal page — no clicking needed
+  </div>
+</div>
+
+    <!-- Browser mockup -->
+    <div class="browser-mockup">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot" style="background:#ef4444"></div>
+          <div class="browser-dot" style="background:#f59e0b"></div>
+          <div class="browser-dot" style="background:#22c55e"></div>
+        </div>
+        <div class="browser-url">
+          🔒 spotify.com/legal/terms-and-conditions
+        </div>
+        <div class="browser-ext">
+          <span style="font-size:16px">🛡️</span>
+          <span class="ext-badge">23</span>
+        </div>
+      </div>
+      <div class="browser-content">
+        <!-- Warning banner -->
+        <div class="warning-banner">
+          <div class="warning-icon">🚨</div>
+          <div style="flex:1">
+            <div class="warning-title">High Risk Page Detected!</div>
+            <div class="warning-desc">
+              4 risky clauses found · Data selling · Auto-renewal trap
+            </div>
+            <div class="warning-btns">
+              <button class="warning-btn-primary">View Details</button>
+              <button class="warning-btn-secondary">Dismiss</button>
+            </div>
+          </div>
+          <div class="warning-score">
+            <div class="warning-score-num">23</div>
+            <div class="warning-score-lbl">Trust Score</div>
+          </div>
+        </div>
+        <!-- Fake highlighted content -->
+        <div style="opacity:0.5">
+          <div class="fake-page-line" style="width:90%"></div>
+          <div class="fake-page-line" style="width:75%"></div>
+          <div class="fake-highlight" style="width:85%"></div>
+          <div class="fake-page-line" style="width:60%"></div>
+          <div class="fake-highlight" style="width:70%;background:rgba(245,158,11,0.15);border-color:var(--yellow)"></div>
+          <div class="fake-page-line" style="width:80%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-item fade-in">
+      <div class="stat-num">10+</div>
+      <div class="stat-label">Dark patterns detected</div>
+    </div>
+    <div class="stat-item fade-in">
+      <div class="stat-num">5s</div>
+      <div class="stat-label">Average scan time</div>
+    </div>
+    <div class="stat-item fade-in">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Free forever</div>
+    </div>
+    <div class="stat-item fade-in">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">LLaMA powered</div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="section-tag">✦ Features</div>
+    <h2>Everything you need<br>to stay protected</h2>
+    <p>LexiGuard works silently in the background so you never have to worry about hidden traps.</p>
+
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">🔴</div>
+        <div class="feature-title">Auto Badge Warning</div>
+        <div class="feature-desc">
+          Extension icon automatically turns red, yellow, or green on any
+          legal page — without you clicking anything. Instant visual alert.
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">🧠</div>
+        <div class="feature-title">AI Dark Pattern Detection</div>
+        <div class="feature-desc">
+          LLaMA AI reads the entire document and identifies hidden
+          subscriptions, data selling, forced consent, and 10+ manipulative patterns.
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">📊</div>
+        <div class="feature-title">Trust Score System</div>
+        <div class="feature-desc">
+          Every document gets a 0-100 trust score so you can instantly
+          know if a website is safe or dangerous before agreeing.
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">✨</div>
+        <div class="feature-title">Legal Simplifier</div>
+        <div class="feature-desc">
+          Converts confusing legal jargon into plain English instantly.
+          "Irrevocable perpetual license" becomes "they own your content forever."
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">📄</div>
+        <div class="feature-title">PDF Contract Analyzer</div>
+        <div class="feature-desc">
+          Upload any PDF — rental agreements, job offers, freelance
+          contracts — and scan for hidden risks in seconds.
+        </div>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon-wrap">⚠️</div>
+        <div class="feature-title">Instant Page Warning</div>
+        <div class="feature-desc">
+          A warning banner slides up automatically on risky pages.
+          See the risk summary without opening the extension at all.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-section">
+    <div class="section" id="how" style="padding-bottom:0">
+      <div class="section-tag">✦ How it works</div>
+      <h2>Protection in 4 simple steps</h2>
+      <p>LexiGuard works automatically — no setup required after install.</p>
+    </div>
+    <div style="max-width:1140px;margin:0 auto;padding:0 48px 80px">
+      <div class="how-grid">
+        <div class="how-step fade-in">
+          <div class="how-step-num">Step 01</div>
+          <span class="how-step-icon">🔌</span>
+          <div class="how-step-title">Install & pin</div>
+          <div class="how-step-desc">
+            Add LexiGuard to Chrome in one click. Pin it to your toolbar for instant visibility.
+          </div>
+        </div>
+        <div class="how-step fade-in">
+          <div class="how-step-num">Step 02</div>
+          <span class="how-step-icon">🌐</span>
+          <div class="how-step-title">Browse normally</div>
+          <div class="how-step-desc">
+            Visit any website. LexiGuard detects legal pages automatically in the background.
+          </div>
+        </div>
+        <div class="how-step fade-in">
+          <div class="how-step-num">Step 03</div>
+          <span class="how-step-icon">🤖</span>
+          <div class="how-step-title">AI scans the page</div>
+          <div class="how-step-desc">
+            LLaMA AI reads the document and identifies every risky clause and dark pattern.
+          </div>
+        </div>
+        <div class="how-step fade-in">
+          <div class="how-step-num">Step 04</div>
+          <span class="how-step-icon">🛡️</span>
+          <div class="how-step-title">See the warning</div>
+          <div class="how-step-desc">
+            Badge turns red and a warning appears. Click for full analysis with plain English explanations.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dark patterns detected -->
+  <section class="section" id="patterns">
+    <div class="section-tag">✦ Detection</div>
+    <h2>Every trick they use —<br>we catch it</h2>
+    <p>LexiGuard knows every dark pattern companies use to trap users into bad deals.</p>
+
+    <div class="patterns-grid">
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">🔄</div>
+        <div class="pattern-name">Auto Renewal</div>
+        <div class="pattern-desc">Hidden subscription renewals that charge you without notice</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">📤</div>
+        <div class="pattern-name">Data Selling</div>
+        <div class="pattern-desc">Your personal data sold to third parties and advertisers</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">🪤</div>
+        <div class="pattern-name">Roach Motel</div>
+        <div class="pattern-desc">Easy to sign up, nearly impossible to cancel</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">💰</div>
+        <div class="pattern-name">Hidden Costs</div>
+        <div class="pattern-desc">Extra fees only revealed at the very last checkout step</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">🔒</div>
+        <div class="pattern-name">Forced Consent</div>
+        <div class="pattern-desc">Cannot use the service without agreeing to data collection</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">👁️</div>
+        <div class="pattern-name">Privacy Abuse</div>
+        <div class="pattern-desc">Excessive tracking of location, contacts, and behaviour</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">🤝</div>
+        <div class="pattern-name">Third Party Sharing</div>
+        <div class="pattern-desc">Data shared with unknown partners and data brokers</div>
+      </div>
+      <div class="pattern-card fade-in">
+        <div class="pattern-emoji">😔</div>
+        <div class="pattern-name">Confirmshaming</div>
+        <div class="pattern-desc">"No thanks, I don't care about my privacy" style buttons</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scan example -->
+  <section class="section" style="padding-top:0">
+    <div class="section-tag">✦ Example</div>
+    <h2>See a real scan result</h2>
+    <p>This is what LexiGuard found on a popular streaming service's Terms of Service.</p>
+
+    <div class="scan-demo fade-in">
+      <div class="scan-demo-header">
+        <div>
+          <div class="scan-demo-title">StreamCo — Terms of Service</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">
+            Scanned automatically · 3 seconds ago
+          </div>
+        </div>
+        <div class="scan-demo-score">
+          <div style="text-align:right;margin-right:10px">
+            <div style="font-size:11px;color:var(--muted)">Trust Score</div>
+            <div style="font-size:11px;color:var(--red);font-weight:700">High Risk</div>
+          </div>
+          <div class="score-circle">23</div>
+        </div>
+      </div>
+      <div class="scan-demo-body">
+        <div class="risk-row high">
+          <span class="risk-pill high">High · Auto Renewal</span>
+          <div class="risk-content">
+            <strong>Subscription renews automatically without notice</strong>
+            <span>You will be charged $19.99/month after trial ends. Cancellation requires calling support — online cancellation is disabled.</span>
+          </div>
+        </div>
+        <div class="risk-row high">
+          <span class="risk-pill high">High · Data Selling</span>
+          <div class="risk-content">
+            <strong>Personal data sold to advertising partners</strong>
+            <span>Your location, browsing history, and contacts are shared with third-party advertisers and data brokers for targeted advertising.</span>
+          </div>
+        </div>
+        <div class="risk-row medium">
+          <span class="risk-pill medium">Medium · Roach Motel</span>
+          <div class="risk-content">
+            <strong>Account deletion requires written letter by post</strong>
+            <span>To close your account, send a certified letter to headquarters 30 days before your next billing cycle.</span>
+          </div>
+        </div>
+        <div class="risk-row low">
+          <span class="risk-pill low">Low · Forced Arbitration</span>
+          <div class="risk-content">
+            <strong>Class action lawsuit rights waived</strong>
+            <span>You agree to resolve all disputes through private arbitration and waive your right to a jury trial.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-glow"></div>
+    <div class="section-tag" style="margin-bottom:24px">✦ Get started</div>
+    <h2>Start protecting<br>yourself today</h2>
+    <p>
+      Free forever. No account needed.
+      Works instantly after install.
+    </p>
+    <a href="#" class="btn-primary" style="display:inline-flex">
+      🛡️ Add LexiGuard to Chrome — Free
+    </a>
+    <div class="cta-note">
+      <div class="cta-note-item">✓ Free forever</div>
+      <div class="cta-note-item">✓ No account required</div>
+      <div class="cta-note-item">✓ Open source</div>
+      <div class="cta-note-item">✓ No data stored</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">
+      <div class="nav-logo-icon" style="width:30px;height:30px;font-size:15px;box-shadow:none">
+        🛡️
+      </div>
+      LexiGuard
+    </div>
+    <ul class="footer-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#patterns">Detection</a></li>
+      <li><a href="https://github.com/Kshithesh-Sathri/lexiguard" target="_blank">GitHub ↗</a></li>
+    </ul>
+    <div class="footer-copy">
+      Built with Node.js · React · LLaMA AI
+    </div>
+  </footer>
+
+  <script>
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const href = a.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Nav background on scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.style.background = 'rgba(5,8,16,0.95)';
+      } else {
+        nav.style.background = 'rgba(5,8,16,0.85)';
+      }
+    });
+  </script>
+
+</body>
+</html>
