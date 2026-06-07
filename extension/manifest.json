@@ -32,6 +32,10 @@
     {
       "resources": ["dashboard/index.html", "icons/*"],
       "matches": ["*://*/*"]
+    },
+    {
+      "resources": ["welcome/index.html", "welcome/index.js"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

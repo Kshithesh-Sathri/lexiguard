@@ -3,203 +3,291 @@
 <head>
   <meta charset="UTF-8">
   <title>Welcome to LexiGuard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #05080f;
+      --violet: #6366f1;
+      --violet2: #8b5cf6;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --text: #f1f5f9;
+      --muted: #64748b;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
-      background: #0f172a;
-      color: #f1f5f9;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow-x: hidden;
     }
-    .container {
-      max-width: 560px;
-      text-align: center;
-      padding: 40px 20px;
+
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 44px 44px;
     }
-    .logo {
-      font-size: 64px;
-      margin-bottom: 16px;
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 45% at 15% 15%, rgba(99,102,241,0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 55% at 85% 85%, rgba(139,92,246,0.07) 0%, transparent 65%);
+    }
+    .scanner-line {
+      position: fixed; left: 0; right: 0; height: 2px;
+      z-index: 0; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.55), transparent);
+      box-shadow: 0 0 18px rgba(56,189,248,0.35);
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan { 0% { top: -2px; } 100% { top: 100vh; } }
+
+    .page {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 600px;
+      padding: 36px 24px 48px;
+    }
+
+    .header { text-align: center; margin-bottom: 28px; }
+    .logo-wrap {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, var(--violet), var(--violet2));
+      border-radius: 20px; font-size: 34px; margin-bottom: 18px;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%,100% { box-shadow: 0 0 40px rgba(99,102,241,0.4); }
+      50%      { box-shadow: 0 0 65px rgba(99,102,241,0.65); }
     }
     h1 {
-      font-size: 32px;
-      font-weight: 800;
-      color: #818cf8;
-      margin-bottom: 8px;
-      letter-spacing: -1px;
+      font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800;
+      background: linear-gradient(135deg, #e2e8f0 0%, var(--violet) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -1px; margin-bottom: 10px;
     }
-    .subtitle {
-      font-size: 16px;
-      color: #64748b;
-      margin-bottom: 40px;
+    .tagline { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 400px; margin: 0 auto; }
+
+    .badge-row {
+      display: flex; gap: 10px; justify-content: center; margin-bottom: 30px;
     }
-    .steps {
-      text-align: left;
-      margin-bottom: 40px;
+    .badge-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 14px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; border: 1px solid;
     }
+    .badge-dot {
+      width: 26px; height: 26px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: white;
+    }
+    .pill-green { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); color: var(--green); }
+    .pill-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); color: var(--amber); }
+    .pill-red   { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.25);  color: var(--red); }
+
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+
     .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px;
-      background: #1e293b;
-      border-radius: 14px;
-      margin-bottom: 12px;
-      border: 1px solid #334155;
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px;
+      background: rgba(14,24,41,0.9);
+      border: 1px solid rgba(56,189,248,0.1);
+      border-radius: 16px;
+      transition: border-color 0.3s, background 0.3s;
     }
+    .step.active  { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.07); }
+    .step.done-step { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.04); }
+
     .step-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      flex-shrink: 0;
+      width: 38px; height: 38px; min-width: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--violet), var(--violet2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: white;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+      transition: all 0.4s; flex-shrink: 0;
     }
-    .step-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-bottom: 4px;
+    .step-num.done {
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      box-shadow: 0 4px 12px rgba(34,197,94,0.3);
     }
-    .step-desc {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.5;
+
+    .step-content { flex: 1; }
+    .step-title { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; line-height: 1.4; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .step-desc strong { color: var(--violet2); font-weight: 600; }
+    .step-icon { font-size: 24px; flex-shrink: 0; align-self: center; }
+
+    .chrome-panel {
+      margin-top: 14px; border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(99,102,241,0.25);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
-    .step-img {
-      font-size: 28px;
-      flex-shrink: 0;
-      margin-left: auto;
-      align-self: center;
+    .cp-header {
+      background: #2d2d2d; padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #3d3d3d;
     }
-    .badge-demo {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 14px 24px;
-      margin-bottom: 40px;
-      border: 1px solid #334155;
+    .cp-title { font-size: 13px; font-weight: 600; color: #e8eaed; }
+    .cp-close {
+      width: 22px; height: 22px; background: #5f6368; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #e8eaed;
     }
-    .badge-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
+    .cp-section-label {
+      background: #292929; padding: 8px 14px;
+      font-size: 11px; font-weight: 700; color: #9aa0a6;
+      letter-spacing: 0.5px; border-bottom: 1px solid #3d3d3d;
     }
-    .badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: white;
+    .cp-section-sub {
+      background: #292929; padding: 0 14px 10px;
+      font-size: 11px; color: #9aa0a6; border-bottom: 1px solid #3d3d3d;
     }
-    .done-btn {
-      padding: 14px 40px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
+    .cp-ext-row {
+      background: #323232; padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid #3d3d3d;
+    }
+    .cp-ext-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; background: #1a1a2e;
+    }
+    .cp-ext-name { font-size: 13px; font-weight: 600; color: #e8eaed; flex: 1; }
+    .cp-pin-btn {
+      width: 32px; height: 32px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; position: relative;
+      animation: pin-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pin-pulse {
+      0%,100% { background: rgba(99,102,241,0.2); color: #818cf8; }
+      50%      { background: rgba(99,102,241,0.4); color: #a5b4fc; }
+    }
+    .cp-pin-tooltip {
+      position: absolute; bottom: calc(100% + 6px); right: 0;
+      background: var(--violet); color: white;
+      font-size: 11px; font-weight: 600; padding: 5px 10px;
+      border-radius: 7px; white-space: nowrap; pointer-events: none;
+      animation: bounce-tip 1.2s ease-in-out infinite;
+    }
+    .cp-pin-tooltip::after {
+      content: ''; position: absolute; top: 100%; right: 10px;
+      border: 5px solid transparent; border-top-color: var(--violet);
+    }
+    @keyframes bounce-tip { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .cp-dots-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #9aa0a6; font-size: 16px; }
+    .cp-manage { background: #2a2a2a; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #9aa0a6; }
+
+    .cta-wrap { position: relative; z-index: 10; }
+    .cta-btn {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--violet), var(--violet2));
+      color: white; border: none; border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 700;
       cursor: pointer;
-      width: 100%;
-      margin-bottom: 12px;
+      position: relative; z-index: 10;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .done-btn:hover { opacity: 0.9; }
-    .skip {
-      font-size: 13px;
-      color: #475569;
-      cursor: pointer;
+    .cta-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.55); }
+    .cta-btn:active { transform: translateY(0); }
+
+    .fleck {
+      position: fixed; pointer-events: none; z-index: 9999;
+      animation: fleckFall var(--d) var(--dl) ease-out both;
     }
-    .skip:hover { color: #64748b; }
-    .highlight-step {
-      border: 1px solid #6366f1;
-      background: rgba(99,102,241,0.08);
+    @keyframes fleckFall {
+      0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--dx), 260px) rotate(720deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">🛡️</div>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="scanner-line"></div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="logo-wrap">🛡️</div>
     <h1>Welcome to LexiGuard</h1>
-    <p class="subtitle">
-      AI-powered protection against dark patterns and hidden risks in legal documents.
-    </p>
-
-    <!-- Badge demo -->
-    <div class="badge-demo">
-      <div class="badge-item">
-        <div class="badge" style="background:#22c55e">✓</div>
-        <span style="color:#22c55e">Safe</span>
-      </div>
-      <div class="badge-item">
-        <div class="badge" style="background:#f59e0b">64</div>
-        <span style="color:#f59e0b">Moderate</span>
-      </div>
-      <div class="badge-item">
-        <div class="badge" style="background:#ef4444">23</div>
-        <span style="color:#ef4444">Dangerous</span>
-      </div>
-    </div>
-
-    <div class="steps">
-
-      <!-- Step 1 - most important -->
-      <div class="step highlight-step">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-title">📌 Pin LexiGuard to your toolbar</div>
-          <div class="step-desc">
-            Click the 🧩 puzzle piece icon in Chrome toolbar →
-            find LexiGuard → click the 📌 pin icon.
-            This lets you see the safety badge on every website.
-          </div>
-        </div>
-        <div class="step-img">🧩</div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">🌐 Visit any Terms or Privacy page</div>
-          <div class="step-desc">
-            LexiGuard automatically scans the page and shows
-            a colored badge on the icon — no clicking needed.
-          </div>
-        </div>
-        <div class="step-img">🔍</div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-title">🛡️ Click the icon to see full results</div>
-          <div class="step-desc">
-            See your trust score, risky clauses, and open the
-            full dashboard for detailed analysis and history.
-          </div>
-        </div>
-        <div class="step-img">📊</div>
-      </div>
-
-    </div>
-
-    <button class="done-btn" onclick="window.close()">
-      ✅ Got it — Let's go!
-    </button>
-    <div class="skip" onclick="window.close()">Skip for now</div>
+    <p class="tagline">AI reads Terms &amp; Conditions so you don't have to — detecting dark patterns, hidden subscriptions, and privacy traps instantly.</p>
   </div>
+
+  <div class="badge-row">
+    <div class="badge-pill pill-green"><div class="badge-dot" style="background:#22c55e">✓</div> Safe</div>
+    <div class="badge-pill pill-amber"><div class="badge-dot" style="background:#f59e0b">64</div> Moderate</div>
+    <div class="badge-pill pill-red"><div class="badge-dot" style="background:#ef4444">23</div> Dangerous</div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step active" id="step1">
+      <div class="step-num" id="num1">1</div>
+      <div class="step-content">
+        <div class="step-title">📌 Pin LexiGuard to your toolbar</div>
+        <div class="step-desc">Click the 🧩 puzzle piece icon in Chrome → find LexiGuard → click the <strong>pin icon</strong> next to it.</div>
+        <div class="chrome-panel" id="chromePanel">
+          <div class="cp-header">
+            <span class="cp-title">Extensions</span>
+            <div class="cp-close">✕</div>
+          </div>
+          <div class="cp-section-label">FULL ACCESS</div>
+          <div class="cp-section-sub">These extensions can see and change information on this site.</div>
+          <div class="cp-ext-row">
+            <div class="cp-ext-icon">🕵️</div>
+            <div class="cp-ext-name">LexiGuard</div>
+            <div class="cp-pin-btn">
+              <div class="cp-pin-tooltip">👆 Click here to pin!</div>
+              📌
+            </div>
+            <div class="cp-dots-btn">⋮</div>
+          </div>
+          <div class="cp-manage">⚙️ &nbsp;Manage extensions</div>
+        </div>
+      </div>
+      <div class="step-icon">🧩</div>
+    </div>
+
+    <div class="step" id="step2">
+      <div class="step-num" id="num2">2</div>
+      <div class="step-content">
+        <div class="step-title">🌐 Visit any Terms or Privacy page</div>
+        <div class="step-desc">LexiGuard automatically detects legal pages and scans them — a colored badge appears on the icon instantly. No clicking needed.</div>
+      </div>
+      <div class="step-icon">🔍</div>
+    </div>
+
+    <div class="step" id="step3">
+      <div class="step-num" id="num3">3</div>
+      <div class="step-content">
+        <div class="step-title">🛡️ Click the icon for full results</div>
+        <div class="step-desc">See your trust score, risky clauses in plain English, and open the full dashboard for history, PDF analysis, and legal simplification.</div>
+      </div>
+      <div class="step-icon">📊</div>
+    </div>
+
+  </div>
+
+  <div class="cta-wrap">
+    <button class="cta-btn" id="mainBtn">✅ I've pinned it — Continue</button>
+  </div>
+
+</div>
+
+<script src="index.js"></script>
 </body>
 </html>
