@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LexiGuard Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <!-- Auth Modal -->
+<div id="auth-modal" style="
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.8);
+  display:none;align-items:center;justify-content:center;
+  z-index:9999;backdrop-filter:blur(8px)">
+  <div style="
+    background:#0d1424;border:1px solid #1e2d45;
+    border-radius:20px;padding:36px;width:400px;
+    box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:40px;margin-bottom:8px">🛡️</div>
+      <div style="font-size:20px;font-weight:700;color:#e2e8f0">
+        LexiGuard
+      </div>
+      <div style="font-size:13px;color:#475569;margin-top:4px">
+        Sign in to save your scan history
+      </div>
+    </div>
+
+    <!-- Tabs -->
+<div style="display:flex;background:#080d1a;border-radius:10px;
+  padding:4px;margin-bottom:24px">
+  <button id="tab-login" style="
+    flex:1;padding:8px;border:none;border-radius:8px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;font-size:13px;font-weight:600;cursor:pointer">
+    Sign In
+  </button>
+  <button id="tab-register" style="
+    flex:1;padding:8px;border:none;border-radius:8px;
+    background:transparent;color:#64748b;
+    font-size:13px;cursor:pointer">
+    Create Account
+  </button>
+</div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <input id="login-email" type="email"
+        placeholder="Email address"
+        style="width:100%;background:#080d1a;border:1px solid #1e2d45;
+        border-radius:10px;padding:12px 14px;color:#f1f5f9;
+        font-size:14px;outline:none;margin-bottom:12px;
+        box-sizing:border-box"/>
+      <input id="login-password" type="password"
+        placeholder="Password"
+        style="width:100%;background:#080d1a;border:1px solid #1e2d45;
+        border-radius:10px;padding:12px 14px;color:#f1f5f9;
+        font-size:14px;outline:none;margin-bottom:16px;
+        box-sizing:border-box"/>
+      <button id="login-btn" style="
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer">
+  Sign In
+</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="form-register" style="display:none">
+      <input id="reg-name" type="text"
+        placeholder="Your name"
+        style="width:100%;background:#080d1a;border:1px solid #1e2d45;
+        border-radius:10px;padding:12px 14px;color:#f1f5f9;
+        font-size:14px;outline:none;margin-bottom:12px;
+        box-sizing:border-box"/>
+      <input id="reg-email" type="email"
+        placeholder="Email address"
+        style="width:100%;background:#080d1a;border:1px solid #1e2d45;
+        border-radius:10px;padding:12px 14px;color:#f1f5f9;
+        font-size:14px;outline:none;margin-bottom:12px;
+        box-sizing:border-box"/>
+      <input id="reg-password" type="password"
+        placeholder="Password (min 6 characters)"
+        style="width:100%;background:#080d1a;border:1px solid #1e2d45;
+        border-radius:10px;padding:12px 14px;color:#f1f5f9;
+        font-size:14px;outline:none;margin-bottom:16px;
+        box-sizing:border-box"/>
+      <button id="register-btn" style="
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer">
+  Create Account
+</button>
+    </div>
+
+    <!-- Error message -->
+    <div id="auth-error" style="
+      display:none;margin-top:12px;padding:10px 14px;
+      background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);
+      border-radius:8px;color:#fca5a5;font-size:13px;text-align:center">
+    </div>
+
+    <!-- Skip -->
+    <button id="skip-auth-btn" style="
+  background:transparent;border:none;
+  color:#334155;font-size:12px;cursor:pointer">
+  Continue without account →
+</button>
+    </div>
+  </div>
+</div>
+
+  <div id="app">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <div class="logo-text">LexiGuard</div>
+          <div class="logo-version">v1.0.0</div>
+        </div>
+      </div>
+     <nav>
+  <button class="nav-btn active" data-page="scanner">
+    <span class="nav-icon">🔍</span> Scanner
+  </button>
+  <button class="nav-btn" data-page="pdf">
+    <span class="nav-icon">📄</span> PDF Analyzer
+  </button>
+  <button class="nav-btn" data-page="history">
+    <span class="nav-icon">📋</span> History
+  </button>
+  <button class="nav-btn" data-page="simplifier">
+    <span class="nav-icon">🧠</span> Simplifier
+  </button>
+  <button class="nav-btn" data-page="compare">
+    <span class="nav-icon">⚖️</span> Compare
+  </button>
+  <button class="nav-btn" data-page="about">
+    <span class="nav-icon">ℹ️</span> About
+  </button>
+</nav>
+      <div class="sidebar-footer">
+        <div class="status-dot">
+          <div class="dot"></div>
+          Backend online
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main id="main">
+
+      <!-- ── Scanner Page ── -->
+      <div id="page-scanner" class="page active">
+        <div class="page-header">
+          <h1>Document Scanner</h1>
+          <p>Paste Terms & Conditions or Privacy Policy to analyze</p>
+        </div>
+
+        <div class="input-card">
+          <input id="url-input" type="text"
+            placeholder="Website URL (optional)"
+            class="input-field"/>
+          <textarea id="text-input"
+            placeholder="Paste Terms & Conditions, Privacy Policy, or any legal text here..."
+            class="textarea-field" rows="10"></textarea>
+          <div class="btn-row">
+            <button id="analyze-btn" class="primary-btn">
+              🔍 Analyze Document
+            </button>
+            <button id="clear-btn" class="secondary-btn">
+              Clear
+            </button>
+          </div>
+          <div id="scan-error" class="error-msg" style="display:none"></div>
+        </div>
+
+        <div id="results" style="display:none">
+
+          <!-- Trust score + summary -->
+          <div class="results-grid">
+            <div class="trust-card">
+              <div class="trust-circle">
+                <svg viewBox="0 0 120 120" width="140" height="140">
+                  <circle cx="60" cy="60" r="50"
+                    fill="none" stroke="#1e2d45" stroke-width="10"/>
+                  <circle id="trust-arc" cx="60" cy="60" r="50"
+                    fill="none" stroke="#22c55e" stroke-width="10"
+                    stroke-dasharray="314" stroke-dashoffset="314"
+                    stroke-linecap="round"
+                    transform="rotate(-90 60 60)"
+                    style="transition: stroke-dashoffset 1s ease"/>
+                </svg>
+                <div class="trust-inner">
+                  <div id="trust-num" class="trust-num">0</div>
+                  <div class="trust-lbl">/ 100</div>
+                </div>
+              </div>
+              <div id="trust-status" class="trust-status">—</div>
+            </div>
+
+            <div class="summary-card">
+              <h3>Risk Summary</h3>
+              <div class="summary-grid">
+                <div class="summary-item">
+                  <div id="s-high" class="summary-num red">0</div>
+                  <div class="summary-lbl">High Risks</div>
+                </div>
+                <div class="summary-item">
+                  <div id="s-med" class="summary-num yellow">0</div>
+                  <div class="summary-lbl">Medium Risks</div>
+                </div>
+                <div class="summary-item">
+                  <div id="s-priv" class="summary-num purple">0</div>
+                  <div class="summary-lbl">Privacy Issues</div>
+                </div>
+                <div class="summary-item">
+                  <div id="s-sub" class="summary-num orange">0</div>
+                  <div class="summary-lbl">Subscription Traps</div>
+                </div>
+              </div>
+              <div id="s-concern" class="concern-text"></div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-row" id="charts-row" style="display:none">
+            <div class="chart-card">
+              <h3>Risk Breakdown</h3>
+              <div class="chart-container">
+                <div id="risk-bar-chart" style="width:100%"></div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>Pattern Types</h3>
+              <div class="chart-container">
+                <div id="pattern-chart" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clauses -->
+          <div class="clauses-section">
+            <div class="clauses-header">
+              <h3 id="clauses-title">Risky Clauses</h3>
+              <button id="download-btn" class="download-btn">
+                ⬇️ Download Report
+              </button>
+            </div>
+            <div id="clauses-list"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── PDF Analyzer Page ── -->
+      <div id="page-pdf" class="page">
+        <div class="page-header">
+          <h1>PDF Analyzer</h1>
+          <p>Upload any PDF contract, agreement, or policy to scan for risks</p>
+        </div>
+
+        <div class="input-card">
+          <div id="drop-zone" class="drop-zone">
+            <div class="drop-icon">📄</div>
+            <div class="drop-title">Drop your PDF here</div>
+            <div class="drop-sub">or click to browse</div>
+            <input type="file" id="pdf-input" accept=".pdf" style="display:none"/>
+          </div>
+
+          <div id="file-info" class="file-info" style="display:none">
+            <span class="file-icon">📄</span>
+            <div>
+              <div id="file-name" class="file-name"></div>
+              <div id="file-size" class="file-size"></div>
+            </div>
+            <button id="remove-file" class="remove-file">✕</button>
+          </div>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button id="analyze-pdf-btn" class="primary-btn" disabled>
+              🔍 Analyze PDF
+            </button>
+          </div>
+          <div id="pdf-error" class="error-msg" style="display:none"></div>
+        </div>
+
+        <div id="pdf-results" style="display:none">
+
+          <div id="pdf-file-stats" class="pdf-file-stats"></div>
+
+          <div class="results-grid">
+            <div class="trust-card">
+              <div class="trust-circle">
+                <svg viewBox="0 0 120 120" width="140" height="140">
+                  <circle cx="60" cy="60" r="50"
+                    fill="none" stroke="#1e2d45" stroke-width="10"/>
+                  <circle id="pdf-trust-arc" cx="60" cy="60" r="50"
+                    fill="none" stroke="#22c55e" stroke-width="10"
+                    stroke-dasharray="314" stroke-dashoffset="314"
+                    stroke-linecap="round"
+                    transform="rotate(-90 60 60)"
+                    style="transition: stroke-dashoffset 1s ease"/>
+                </svg>
+                <div class="trust-inner">
+                  <div id="pdf-trust-num" class="trust-num">0</div>
+                  <div class="trust-lbl">/ 100</div>
+                </div>
+              </div>
+              <div id="pdf-trust-status" class="trust-status">—</div>
+            </div>
+
+            <div class="summary-card">
+              <h3>Risk Summary</h3>
+              <div class="summary-grid">
+                <div class="summary-item">
+                  <div id="pdf-s-high" class="summary-num red">0</div>
+                  <div class="summary-lbl">High Risks</div>
+                </div>
+                <div class="summary-item">
+                  <div id="pdf-s-med" class="summary-num yellow">0</div>
+                  <div class="summary-lbl">Medium Risks</div>
+                </div>
+                <div class="summary-item">
+                  <div id="pdf-s-priv" class="summary-num purple">0</div>
+                  <div class="summary-lbl">Privacy Issues</div>
+                </div>
+                <div class="summary-item">
+                  <div id="pdf-s-sub" class="summary-num orange">0</div>
+                  <div class="summary-lbl">Subscription Traps</div>
+                </div>
+              </div>
+              <div id="pdf-s-concern" class="concern-text"></div>
+            </div>
+          </div>
+
+          <div class="clauses-section">
+            <div class="clauses-header">
+              <h3 id="pdf-clauses-title">Risky Clauses</h3>
+              <button id="pdf-download-btn" class="download-btn">
+                ⬇️ Download Report
+              </button>
+            </div>
+            <div id="pdf-clauses-list"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── History Page ── -->
+      <div id="page-history" class="page">
+        <div class="page-header">
+          <h1>Scan History</h1>
+          <p>All your previous document scans</p>
+        </div>
+        <div id="history-stats" class="history-stats" style="display:none"></div>
+        <div id="history-list"></div>
+      </div>
+
+      <!-- ── Simplifier Page ── -->
+      <div id="page-simplifier" class="page">
+        <div class="page-header">
+          <h1>Legal Simplifier</h1>
+          <p>Paste any legal clause and get a plain English explanation</p>
+        </div>
+        <div class="input-card">
+          <textarea id="simplifier-input"
+            placeholder="Paste any legal clause here...&#10;&#10;Example: 'User hereby grants irrevocable perpetual license to host, reproduce, modify, and distribute content...'"
+            class="textarea-field" rows="6"></textarea>
+          <button id="simplify-btn" class="primary-btn">
+            🧠 Simplify This Clause
+          </button>
+        </div>
+        <div id="simplifier-result" style="display:none" class="simplifier-result"></div>
+      </div>
+
+      <!-- ── Compare Page ── -->
+<div id="page-compare" class="page">
+  <div class="page-header">
+    <h1>Document Comparison</h1>
+    <p>Paste old and new versions of a Terms page to see exactly what changed</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <!-- Old version -->
+    <div class="input-card" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#64748b"></div>
+        <span style="font-size:13px;font-weight:600;color:#94a3b8">Old Version</span>
+      </div>
+      <textarea id="old-text" class="textarea-field" rows="12"
+        placeholder="Paste the OLD Terms of Service here...&#10;&#10;Example: Copy the current terms from a website before they update it"></textarea>
+    </div>
+
+    <!-- New version -->
+    <div class="input-card" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#6366f1"></div>
+        <span style="font-size:13px;font-weight:600;color:#818cf8">New Version</span>
+      </div>
+      <textarea id="new-text" class="textarea-field" rows="12"
+        placeholder="Paste the NEW Terms of Service here...&#10;&#10;Example: Copy the updated terms after a company sends a 'we updated our terms' email"></textarea>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <input id="site-name" type="text" class="input-field"
+        placeholder="Site name (e.g. Spotify, Netflix)"
+        style="flex:1;margin-bottom:0;min-width:200px"/>
+      <button id="compare-btn" class="primary-btn">
+        ⚖️ Compare Documents
+      </button>
+    </div>
+    <div id="compare-error" class="error-msg" style="display:none"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="compare-results" style="display:none">
+
+    <!-- Verdict banner -->
+    <div id="verdict-banner" style="border-radius:16px;padding:24px;
+      margin-bottom:20px;border:1px solid">
+      <div style="display:flex;align-items:center;justify-content:space-between;
+        flex-wrap:wrap;gap:16px">
+        <div>
+          <div id="verdict-title" style="font-size:22px;font-weight:800;
+            margin-bottom:6px"></div>
+          <div id="verdict-reason" style="font-size:14px;color:#94a3b8"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="text-align:center">
+            <div id="old-score-num"
+              style="font-size:32px;font-weight:800;color:#64748b"></div>
+            <div style="font-size:11px;color:#475569">Old Score</div>
+          </div>
+          <div style="font-size:24px;color:#475569">→</div>
+          <div style="text-align:center">
+            <div id="new-score-num"
+              style="font-size:32px;font-weight:800"></div>
+            <div style="font-size:11px;color:#475569">New Score</div>
+          </div>
+          <div id="score-change-badge"
+            style="font-size:14px;font-weight:700;padding:6px 14px;
+            border-radius:20px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div id="compare-stats"
+      style="display:grid;grid-template-columns:repeat(4,1fr);
+      gap:12px;margin-bottom:20px"></div>
+
+    <!-- Changes list -->
+    <div style="display:flex;justify-content:space-between;
+      align-items:center;margin-bottom:14px">
+      <h3 style="font-size:16px;font-weight:600;color:#e2e8f0"
+        id="changes-title">Changes</h3>
+      <div style="display:flex;gap:8px" id="filter-btns">
+        <button class="filter-btn active" data-filter="all"
+          style="padding:5px 14px;border-radius:20px;font-size:12px;
+          cursor:pointer;border:1px solid #334155;background:#1e293b;
+          color:#94a3b8">All</button>
+        <button class="filter-btn" data-filter="Negative"
+          style="padding:5px 14px;border-radius:20px;font-size:12px;
+          cursor:pointer;border:1px solid #334155;background:transparent;
+          color:#ef4444">Negative</button>
+        <button class="filter-btn" data-filter="Positive"
+          style="padding:5px 14px;border-radius:20px;font-size:12px;
+          cursor:pointer;border:1px solid #334155;background:transparent;
+          color:#22c55e">Positive</button>
+        <button class="filter-btn" data-filter="Neutral"
+          style="padding:5px 14px;border-radius:20px;font-size:12px;
+          cursor:pointer;border:1px solid #334155;background:transparent;
+          color:#64748b">Neutral</button>
+      </div>
+    </div>
+
+    <div id="changes-list"></div>
+
+  </div>
+</div>
+
+      <!-- ── About Page ── -->
+      <div id="page-about" class="page">
+        <div class="page-header">
+          <h1>About LexiGuard</h1>
+          <p>AI-powered consumer protection tool</p>
+        </div>
+        <div class="about-card">
+          <div class="about-feature">
+            <span class="about-icon">🔍</span>
+            <div>
+              <strong>Dark Pattern Detection</strong>
+              <p>Identifies 10+ types of manipulative legal practices</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <span class="about-icon">📊</span>
+            <div>
+              <strong>Trust Score System</strong>
+              <p>AI calculates a 0-100 trust score for any document</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <span class="about-icon">🧠</span>
+            <div>
+              <strong>Legal Simplifier</strong>
+              <p>Converts legal jargon into plain English instantly</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <span class="about-icon">📋</span>
+            <div>
+              <strong>Scan History</strong>
+              <p>Keeps track of all your previous document scans</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <span class="about-icon">⬇️</span>
+            <div>
+              <strong>PDF Reports</strong>
+              <p>Download full analysis reports for any scan</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <span class="about-icon">🌐</span>
+            <div>
+              <strong>Live Backend</strong>
+              <p>Deployed on Render — works without running localhost</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <script src="dashboard.js"></script>
+</body>
+</html>
