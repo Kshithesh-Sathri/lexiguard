@@ -5,9 +5,9 @@ dotenv.config();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const MODELS = [
-  'llama-3.3-70b-versatile',
-  'llama-3.1-8b-instant',
-  'llama3-8b-8192'
+  'openai/gpt-oss-120b',   // primary — replacement for llama-3.3-70b-versatile
+  'openai/gpt-oss-20b',    // fast fallback — replacement for llama-3.1-8b-instant
+  'qwen/qwen3.6-27b'       // secondary fallback
 ];
 
 export async function analyzeDocument(text) {
