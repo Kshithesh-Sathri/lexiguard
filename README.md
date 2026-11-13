@@ -14,7 +14,7 @@ AI-powered Chrome extension that automatically detects dark patterns, hidden sub
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq%20AI-GPT--OSS%20%7C%20Qwen-f97316?style=flat-square)
+![Groq](https://img.shields.io/badge/Groq%20AI-LLaMA%203.3%2070B-f97316?style=flat-square)
 ![PostgreSQL](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=flat-square&logo=supabase&logoColor=white)
 ![Chrome Extension](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)
 
@@ -60,10 +60,7 @@ The extension icon changes color the moment a scan completes:
 | 🔴 **! Red** | Dangerous (below 60) |
 
 ### 🧠 AI Dark Pattern Detection (10 Categories)
-PPowered by Groq API with a multi-model fallback system:
-- Primary: OpenAI GPT-OSS 120B
-- First fallback: OpenAI GPT-OSS 20B
-- Secondary fallback: Qwen 3.6 27B
+Powered by **LLaMA 3.3 70B** via Groq — the fastest LLM inference available:
 
 | Dark Pattern | What It Means |
 |---|---|
@@ -128,8 +125,7 @@ Content Script (extracts page text via smart DOM selectors)
 Node.js + Express REST API (localhost:5000 / Render.com)
           │
           ▼
-Groq API → GPT-OSS 120B → GPT-OSS 20B → Qwen 3.6 27B
-                         (fallback models)
+Groq API → LLaMA 3.3 70B (structured JSON analysis)
           │
     ┌─────┴──────┐
     ▼            ▼
@@ -143,7 +139,7 @@ Supabase DB   Extension UI
 | Content Script | Vanilla JS | DOM scraping, text highlighting, warning banners |
 | Background Worker | Service Worker | Tab monitoring, auto-detect legal pages |
 | REST API | Node.js + Express | Handle requests, fallback models |
-| AI Engine | Groq API — GPT-OSS 120B, GPT-OSS 20B, Qwen 3.6 27B | Multi-model fallback for dark pattern detection |
+| AI Engine | Groq — LLaMA 3.3 70B | Detect dark patterns, deterministic output |
 | Database | PostgreSQL via Supabase | Scan history (auto + manual) |
 | PDF Parsing | pdf-parse | Extract text from uploaded contracts |
 | Deployment | Render + Netlify | Host backend + landing page |
@@ -331,7 +327,7 @@ lexiguard/
 
 2. **Extraction** — Content script extracts the page text using smart DOM selectors targeting legal content containers.
 
-3. **AI Analysis** — Text is sent to the Groq API with a carefully engineered prompt. GPT-OSS 120B is used as the primary model, with GPT-OSS 20B and Qwen 3.6 27B as automatic fallbacks. The selected model returns a structured JSON response identifying risky clauses.
+3. **AI Analysis** — Text is sent to the Groq API with a carefully engineered prompt. LLaMA 3.3 70B returns a structured JSON response with all risky clauses identified.
 
 4. **Display** — The extension icon badge changes color, a warning banner slides up on the page, and risky text is highlighted directly on the webpage.
 
