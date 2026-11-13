@@ -92,8 +92,9 @@ ${cleanText}`
       }
     ],
     temperature: 0,
-    seed: 42,
-    max_tokens: 1500
+seed: 42,
+response_format: { type: "json_object" },
+max_tokens: 3000
   });
 
   let output = completion.choices[0].message.content.trim();
